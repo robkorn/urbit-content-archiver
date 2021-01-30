@@ -22,6 +22,11 @@ Usage:
         urbit-operator-toolkit chat export <chat-ship> <chat-name>
 "#;
 
+// Later on add
+// ### `--code=<code>`
+// ### `--ship_ip=<ip>`
+// ### `--ship_port=<port>`
+
 #[derive(Debug, Deserialize)]
 struct Args {
     cmd_chat: bool,
@@ -31,17 +36,12 @@ struct Args {
 }
 
 fn main() {
-    // Acquire the `ShipInterface` and create the channel
-    let ship = basic_setup();
+    // Acquire the `ShipInterface` and CLI args
+    let (ship, args) = basic_setup();
     let mut channel = ship.create_channel().unwrap();
 
     // Print the ascii title
     println!("{}", ASCII_TITLE);
-
-    // Read command line arguments
-    let args: Args = Docopt::new(USAGE)
-        .and_then(|d| d.deserialize())
-        .unwrap_or_else(|e| e.exit());
 
     // Chat export
     if args.cmd_chat && args.cmd_export {
@@ -77,7 +77,12 @@ fn export_chat(args: Args, channel: &mut Channel) {
 }
 
 /// Basic setup of generating a config file and getting a `ShipInterface` from local config.
-fn basic_setup() -> ShipInterface {
+fn basic_setup() -> (ShipInterface, Args) {
+    // Read command line arguments
+    let args: Args = Docopt::new(USAGE)
+        .and_then(|d| d.deserialize())
+        .unwrap_or_else(|e| e.exit());
+
     if let Some(_) = create_new_ship_config_file() {
         println!("Ship configuration file created. Please edit it with your ship information to use the toolkit.");
         std::process::exit(0);
@@ -85,7 +90,7 @@ fn basic_setup() -> ShipInterface {
     let ship_interface_res = ship_interface_from_local_config();
     // Error checking
     if let Some(ship) = ship_interface_res {
-        return ship;
+        return (ship, args);
     } else {
         println!("Failed to connect to Ship using information from local config.");
         std::process::exit(1);
