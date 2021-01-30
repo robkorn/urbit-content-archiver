@@ -3,7 +3,8 @@ use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
 use urbit_http_api::{
-    create_new_ship_config_file, ship_interface_from_local_config, Channel, ShipInterface,
+    create_new_ship_config_file, ship_interface_from_config, ship_interface_from_local_config,
+    Channel, ShipInterface,
 };
 
 const ASCII_TITLE: &'static str = r#"
@@ -19,13 +20,11 @@ const ASCII_TITLE: &'static str = r#"
 
 const USAGE: &'static str = r#"
 Usage:
-        urbit-operator-toolkit chat export <chat-ship> <chat-name>
-"#;
+        urbit-operator-toolkit chat export <chat-ship> <chat-name> [--config=<path>]
+Options:
+      --config=<path>  Specify a custom path to a YAML ship config file.
 
-// Later on add
-// ### `--code=<code>`
-// ### `--ship_ip=<ip>`
-// ### `--ship_port=<port>`
+"#;
 
 #[derive(Debug, Deserialize)]
 struct Args {
@@ -33,6 +32,7 @@ struct Args {
     cmd_export: bool,
     arg_chat_ship: String,
     arg_chat_name: String,
+    flag_config: String,
 }
 
 fn main() {
@@ -83,16 +83,28 @@ fn basic_setup() -> (ShipInterface, Args) {
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
-    if let Some(_) = create_new_ship_config_file() {
-        println!("Ship configuration file created. Please edit it with your ship information to use the toolkit.");
-        std::process::exit(0);
+    // If no custom config file provided
+    if args.flag_config.is_empty() {
+        if let Some(_) = create_new_ship_config_file() {
+            println!("Ship configuration file created. Please edit it with your ship information to use the toolkit.");
+            std::process::exit(0);
+        }
+        let ship_interface_res = ship_interface_from_local_config();
+        // Error checking
+        if let Some(ship) = ship_interface_res {
+            return (ship, args);
+        } else {
+            println!("Failed to connect to Ship using information from local config.");
+            std::process::exit(1);
+        }
     }
-    let ship_interface_res = ship_interface_from_local_config();
-    // Error checking
-    if let Some(ship) = ship_interface_res {
-        return (ship, args);
-    } else {
-        println!("Failed to connect to Ship using information from local config.");
-        std::process::exit(1);
+    // If custom config file is provided
+    else {
+        if let Some(ship) = ship_interface_from_config(&args.flag_config) {
+            return (ship, args);
+        } else {
+            println!("Failed to connect to Ship using information from custom config file.\nPlease make sure the path to the file is correct and the config is filled out properly.");
+            std::process::exit(1);
+        }
     }
 }
