@@ -1,14 +1,18 @@
 ![](images/uot-screenshot.png)
 
-The Urbit Operator Toolkit is a small CLI application that interacts with your ship externally and allows you to perform useful functionality as a ship operator.
+The Urbit Operator Toolkit is a small CLI application that interacts with your ship externally and exposes various useful functionality as a ship operator.
 
-The first feature of the toolkit is the ability to export chat logs from any chat which your ship has joined. Further useful functionality/"tools" will be added over time as the [Rust Urbit HTTP API Crate](https://crates.io/crates/urbit-http-api) continues to be updated and have more functionality to expose here for end users.
+The first feature of the toolkit is the ability to export chat logs from any chat which your ship has joined. Further useful "tools" will be added over time as the [Rust Urbit HTTP API Crate](https://crates.io/crates/urbit-http-api) continues to be updated and supports further use cases.
 
 ## Using The Toolkit
 
 ```
 Usage:
-        urbit-operator-toolkit chat export <chat-ship> <chat-name>
+        urbit-operator-toolkit chat export <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
+Options:
+      --config=<file_path>  Specify a custom path to a YAML ship config file.
+      --output=<folder_path>  Specify a custom path where the output file will be saved.
+
 ```
 
 As can be seen above, the Urbit Operator Toolkit is quite straightforward to use. It uses a non-interactive interface in order to allow the toolkit to be interoperable with other tools/applications. This allows for setting up cron-jobs to say backup a chat every X hours, setup hotkeys to do it on-command, or anything you can imagine in between.
@@ -17,7 +21,7 @@ As can be seen above, the Urbit Operator Toolkit is quite straightforward to use
 
 ### `chat export`
 
-This command allows you to export any chat which your ship has joined.
+This command allows you to export the chat log from any chat which your ship has joined.
 
 It can be used as such:
 
@@ -34,6 +38,14 @@ The chat graph will be requested from your ship (may take a number of seconds fo
 ```
 
 This is saved as a local text file as `<chat_ship>-<chat_name>.txt`.
+
+### `--config=<file_path>`
+
+This flag allows you to specify which ship config yaml file to use via file path. This and other flags can be useful for many circumstances, such as setting up a cron job.
+
+### `--output=<folder_path>`
+
+This flag allows you to specify the output folder path where the output file will be saved.
 
 ## Building The Toolkit
 
