@@ -20,9 +20,10 @@ const ASCII_TITLE: &'static str = r#"
 
 const USAGE: &'static str = r#"
 Usage:
-        urbit-operator-toolkit chat export <chat-ship> <chat-name> [--config=<path>]
+        urbit-operator-toolkit chat export <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
 Options:
-      --config=<path>  Specify a custom path to a YAML ship config file.
+      --config=<file_path>  Specify a custom path to a YAML ship config file.
+      --output=<folder_path>  Specify a custom path where the output file will be saved.
 
 "#;
 
@@ -33,6 +34,7 @@ struct Args {
     arg_chat_ship: String,
     arg_chat_name: String,
     flag_config: String,
+    flag_output: String,
 }
 
 fn main() {
@@ -54,23 +56,34 @@ fn main() {
 
 /// Exports the chat resource provided via arguments
 fn export_chat(args: Args, channel: &mut Channel) {
+    // Set the path where the file will be saved
     let file_name = format!("{}-{}.txt", &args.arg_chat_ship[1..], &args.arg_chat_name);
+    let file_path = match args.flag_output.is_empty() {
+        true => file_name,
+        false => format!("{}/{}", args.flag_output, file_name),
+    };
+
     println!(
         "Requesting {}/{} chat graph from your ship...",
         &args.arg_chat_ship, &args.arg_chat_name
     );
+
+    // Acquire the chat log from the ship
     let chat_log_res = channel
         .chat()
         .export_chat_log(&args.arg_chat_ship, &args.arg_chat_name);
+
+    // Save to file if acquiring and processing the chat log was successful
     if let Ok(chat_log) = chat_log_res {
         println!("Chat graph received from ship.\nWriting chat to local file...");
-        let mut f = File::create(&file_name).expect("Failed to create chat export text file.");
+
+        let mut f = File::create(&file_path).expect("Failed to create chat export text file.");
         // Write messages to file
         for message in chat_log {
             writeln!(f, "{}", message).expect("Failed to write chat message to export text file.");
         }
 
-        println!("Finished saving chat to: {}", file_name);
+        println!("Finished saving chat to: {}", file_path);
     } else {
         println!("Failed to export chat. Please make sure that the `chat_ship` & `chat_name` are valid and are from a chat that your ship has joined.")
     }
