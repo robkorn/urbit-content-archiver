@@ -43,19 +43,22 @@ pub fn is_media_file_url(url: &str) -> bool {
 
 /// Creates the archived content directory
 pub fn create_content_dir(args: &Args) {
-    let content_dir = get_content_dir(args);
-    // Create base directory
-    let _res = fs::create_dir("archived-content");
-    // Create sub directory
-    let _res = fs::create_dir(content_dir);
+    // Create root archive directory
+    let _res = fs::create_dir(get_root_dir(args));
+    // Create content sub-directory
+    let _res = fs::create_dir(get_content_dir(args));
 }
 
 /// Acquires the current content directory based on the argument flags
 pub fn get_content_dir(args: &Args) -> String {
-    let mut path_string =
-        "archived-content".to_string() + "/" + &args.arg_ship + "-" + &args.arg_name;
+    get_root_dir(args) + "/" + "archived-content"
+}
+
+/// Get the root directory for the archive
+pub fn get_root_dir(args: &Args) -> String {
+    let mut path_string = args.arg_ship[1..].to_string() + "-" + &args.arg_name;
     if !args.flag_output.is_empty() {
-        path_string = args.flag_output.to_string() + "/" + &path_string;
+        path_string = args.flag_output.to_string();
     }
     path_string
 }

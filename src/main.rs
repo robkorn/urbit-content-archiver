@@ -59,10 +59,7 @@ fn main() {
 fn export_chat(args: Args, channel: &mut Channel) {
     // Set the path where the file will be saved
     let file_name = format!("{}-{}.md", &args.arg_ship[1..], &args.arg_name);
-    let file_path = match args.flag_output.is_empty() {
-        true => file_name,
-        false => format!("{}/{}", args.flag_output, file_name),
-    };
+    let file_path = format!("{}/{}", get_root_dir(&args), file_name);
 
     println!(
         "Requesting {}/{} chat graph from your ship...",
