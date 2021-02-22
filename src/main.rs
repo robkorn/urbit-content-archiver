@@ -7,8 +7,8 @@ use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
 use urbit_http_api::{
-    chat::Message, create_new_ship_config_file, ship_interface_from_config,
-    ship_interface_from_local_config, Channel, ShipInterface,
+    create_new_ship_config_file, ship_interface_from_config, ship_interface_from_local_config,
+    Channel, ShipInterface,
 };
 
 const ASCII_TITLE: &'static str = r#"
@@ -78,13 +78,20 @@ fn export_chat(args: Args, channel: &mut Channel) {
     if let Ok(authored_messages) = authored_messages_res {
         println!("Chat graph received from ship.\nWriting chat to local file...");
         let mut f = File::create(&file_path).expect("Failed to create chat export markdown file.");
+        // Write markdown header into file
+        writeln!(f, "# {}/{} Archive ", &args.arg_ship, &args.arg_name)
+            .expect("Failed to write chat message to export markdown file.");
 
         // Write messages to file
         for authored_message in authored_messages {
             let markdown_message = to_markdown_string(&args, &authored_message);
             // Write the new message to the file
-            writeln!(f, "{}:{}  ", authored_message.author, markdown_message)
-                .expect("Failed to write chat message to export markdown file.");
+            writeln!(
+                f,
+                "_{}_ **{}**:{}  ",
+                authored_message.timestamp, authored_message.author, markdown_message
+            )
+            .expect("Failed to write chat message to export markdown file.");
         }
 
         println!(

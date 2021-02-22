@@ -708,9 +708,9 @@ dependencies = [
 
 [[package]]
 name = "mio"
-version = "0.7.8"
+version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc250d6848c90d719ea2ce34546fb5df7af1d3fd189d10bf7bad80bfcebecd95"
+checksum = "a5dede4e2065b3842b8b0af444119f3aa331cc7cc2dd20388bfb0f5d5a38823a"
 dependencies = [
  "libc",
  "log",
@@ -1310,7 +1310,7 @@ dependencies = [
  "bytes 1.0.1",
  "libc",
  "memchr",
- "mio 0.7.8",
+ "mio 0.7.9",
  "num_cpus",
  "pin-project-lite 0.2.4",
 ]
@@ -1453,7 +1453,7 @@ dependencies = [
 [[package]]
 name = "urbit-http-api"
 version = "0.3.1"
-source = "git+https://github.com/robkorn/rust-urbit-http-api/?branch=main#235d7db40d96481ebbed8649680815a25b0d4caa"
+source = "git+https://github.com/robkorn/rust-urbit-http-api/?branch=main#3beff965d8012fc0163fca49b46dd1217b1d51f4"
 dependencies = [
  "chrono",
  "crossbeam",
