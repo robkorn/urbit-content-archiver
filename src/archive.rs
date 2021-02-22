@@ -1,5 +1,7 @@
 use crate::Args;
+use json::object;
 use std::{fs, fs::File, path::Path};
+use urbit_http_api::chat::{AuthoredMessage, Message};
 
 /// Downloads a file to the archived content directory.
 /// Returns the path as a `String` on success.
@@ -12,6 +14,8 @@ pub fn download_file(args: &Args, url: &str) -> Option<String> {
     let image_name = split_url[split_url.len() - 1];
     let path_string = get_content_dir(args) + "/" + image_name;
     let path = Path::new(&path_string);
+
+    println!("Downloading {}", image_name);
 
     // Create and save the file
     let mut file = File::create(&path).ok()?;
@@ -54,4 +58,38 @@ pub fn get_content_dir(args: &Args) -> String {
         path_string = args.flag_output.to_string() + "/" + &path_string;
     }
     path_string
+}
+
+/// Convert an `AuthoredMessage` into a single markdown `String`
+/// with the media files
+pub fn to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> String {
+    let mut new_content_list = vec![];
+    for json in &authored_message.message.content_list {
+        // If the json content is a URL
+        if !json["url"].is_empty() {
+            // If the URL is a media file
+            let url = format!("{}", json["url"]);
+            if is_media_file_url(&url) {
+                // download the media file locally and add location to text
+                if let Some(file_path) = download_file(&args, &url) {
+                    let markdown_json = object! {
+                        "text": format!("![]({})", &file_path)
+                    };
+                    new_content_list.push(markdown_json);
+                }
+            }
+            // If it's not a media file, it's just a normal url which needs to be linked
+            else {
+                let markdown_json = object! {
+                    "text": format!("[{}]({})", url, url)
+                };
+                new_content_list.push(markdown_json);
+            }
+        } else {
+            new_content_list.push(json.clone())
+        }
+    }
+    // The new `Message` that has had any media links downloaded & processed
+    let new_message = Message::from_json(new_content_list);
+    new_message.to_formatted_string()
 }

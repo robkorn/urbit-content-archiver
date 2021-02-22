@@ -81,29 +81,9 @@ fn export_chat(args: Args, channel: &mut Channel) {
 
         // Write messages to file
         for authored_message in authored_messages {
-            let mut new_content_list = vec![];
-            for json in &authored_message.message.content_list {
-                // If the json content is a URL
-                if !json["url"].is_empty() {
-                    // If the URL is a media file
-                    let url = format!("{}", json["url"]);
-                    if is_media_file_url(&url) {
-                        // Download the media file locally and add location to text
-                        if let Some(file_path) = download_file(&args, &url) {
-                            let markdown_json = object! {
-                                "text": format!("![]({})", &file_path)
-                            };
-                            new_content_list.push(markdown_json);
-                        }
-                    }
-                } else {
-                    new_content_list.push(json.clone())
-                }
-            }
-            // The new `Message` that has had any media links downloaded & processed
-            let new_message = Message::from_json(new_content_list);
+            let markdown_message = to_markdown_string(&args, &authored_message);
             // Write the new message to the file
-            writeln!(f, "{}", new_message.to_formatted_string())
+            writeln!(f, "{}:{}  ", authored_message.author, markdown_message)
                 .expect("Failed to write chat message to export markdown file.");
         }
 
