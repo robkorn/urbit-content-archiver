@@ -31,15 +31,9 @@ It can be used as such:
 ./urbit-content-archiver chat ~darrux-landes development
 ```
 
-The chat graph will be requested from your ship (may take a number of seconds for your ship to process the request depending on chat size), and then once received, processed into a clean formatting style as seen below (do note all times are in UTC):
+The chat graph will be requested from your ship (may take a number of seconds for your ship to process the request depending on chat size), and then once received, processed into a clean markdown formatting style as seen above (do note the above is a processed preview from the markdown).
 
-```
-2020-04-29 01:19:06 - ~risruc-habteb: which is the head of the subject, i.e., the type of `versioned-state` from the line above.
-2020-04-29 01:21:50 - ~risruc-habteb: then, every time you do `=^  cards  state`
-2020-04-29 01:23:10 - ~sarpen-laplux: the general pattern is that it's replacing a part in the subject, usually the state or something in the state, and then producing a set of effects to return. but it could be used for things other than state and effects, but it's very useful for that
-```
-
-This is saved locally as `<ship>-<name>.md` and the downloaded media files are stored in the `archived-content` folder.
+The markdown chat archive is saved locally as `<ship>-<name>.md` and the downloaded media files are stored in the `archived-content` folder.
 
 ### `--config=<file_path>`
 
@@ -47,7 +41,7 @@ This flag allows you to specify which ship config yaml file to use via file path
 
 ### `--output=<folder_path>`
 
-This flag allows you to specify the output folder path where the content output files will be saved.
+This flag allows you to specify the output folder path where the archived data will be saved.
 
 ## Building The Application
 
@@ -61,12 +55,12 @@ Ensure that you have the [latest version of Rust installed](https://rustup.rs/) 
 sh setup.sh
 ```
 
-3. The Urbit Content Archiver application will be compiled, moved into the `deployed` folder, and a config file will be generated automatically for you.
+3. The Urbit Content Archiver application will be compiled, moved into the `deployed` folder, and begin using the application.
 
-4. Edit `ship_config.yaml` with your Urbit ship's ip/port/`+code`.
-
-5. Use the archiver:
+4. Use the archiver:
 
 ```sh
-./urbit-content-archiver
+./urbit-content-archiver chat ~darrux-landes development
 ```
+
+5. If you haven't specified one already, the `ship_config.yaml` will be automatically generated for you and will require editing to add your Urbit ship's ip/port/`+code`.
