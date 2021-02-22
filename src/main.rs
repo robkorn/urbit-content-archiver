@@ -8,19 +8,17 @@ use urbit_http_api::{
 };
 
 const ASCII_TITLE: &'static str = r#"
-  _    _      _     _ _      ____                       _             _______          _ _    _ _
- | |  | |    | |   (_) |    / __ \                     | |           |__   __|        | | |  (_) |
- | |  | |_ __| |__  _| |_  | |  | |_ __   ___ _ __ __ _| |_ ___  _ __   | | ___   ___ | | | ___| |_
- | |  | | '__| '_ \| | __| | |  | | '_ \ / _ \ '__/ _` | __/ _ \| '__|  | |/ _ \ / _ \| | |/ / | __|
- | |__| | |  | |_) | | |_  | |__| | |_) |  __/ | | (_| | || (_) | |     | | (_) | (_) | |   <| | |_
-  \____/|_|  |_.__/|_|\__|  \____/| .__/ \___|_|  \__,_|\__\___/|_|     |_|\___/ \___/|_|_|\_\_|\__|
-                                  | |
-                                  |_|
+  _    _      _     _ _      _____            _             _                       _     _
+ | |  | |    | |   (_) |    / ____|          | |           | |       /\            | |   (_)
+ | |  | |_ __| |__  _| |_  | |     ___  _ __ | |_ ___ _ __ | |_     /  \   _ __ ___| |__  ___   _____ _ __
+ | |  | | '__| '_ \| | __| | |    / _ \| '_ \| __/ _ \ '_ \| __|   / /\ \ | '__/ __| '_ \| \ \ / / _ \ '__|
+ | |__| | |  | |_) | | |_  | |___| (_) | | | | ||  __/ | | | |_   / ____ \| | | (__| | | | |\ V /  __/ |
+  \____/|_|  |_.__/|_|\__|  \_____\___/|_| |_|\__\___|_| |_|\__| /_/    \_\_|  \___|_| |_|_| \_/ \___|_|
 "#;
 
 const USAGE: &'static str = r#"
 Usage:
-        urbit-operator-toolkit chat export <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver chat <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
       --output=<folder_path>  Specify a custom path where the output file will be saved.
@@ -30,7 +28,6 @@ Options:
 #[derive(Debug, Deserialize)]
 struct Args {
     cmd_chat: bool,
-    cmd_export: bool,
     arg_chat_ship: String,
     arg_chat_name: String,
     flag_config: String,
@@ -46,7 +43,7 @@ fn main() {
     println!("{}", ASCII_TITLE);
 
     // Chat export
-    if args.cmd_chat && args.cmd_export {
+    if args.cmd_chat {
         export_chat(args, &mut channel);
     }
 

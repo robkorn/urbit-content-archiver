@@ -1,32 +1,32 @@
-![](images/uot-screenshot.png)
+![](images/title.png)
 
-The Urbit Operator Toolkit is a small CLI application that interacts with your ship externally and exposes various useful functionality as a ship operator.
+The Urbit Content Archiver is a small CLI application that exports channels from your Urbit ship and auto-downloads any linked media content locally in order to preserve and archive the content for the future.
 
-The first feature of the toolkit is the ability to export chat logs from any chat which your ship has joined. Further useful "tools" will be added over time as the [Rust Urbit HTTP API Crate](https://crates.io/crates/urbit-http-api) continues to be updated and supports further use cases.
+This application uses the [Rust Urbit HTTP API Crate](https://crates.io/crates/urbit-http-api).
 
-## Using The Toolkit
+## Using The Urbit Content Archiver
 
 ```
 Usage:
-        urbit-operator-toolkit chat export <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver chat <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
       --output=<folder_path>  Specify a custom path where the output file will be saved.
 
 ```
 
-As can be seen above, the Urbit Operator Toolkit is quite straightforward to use. It uses a non-interactive interface in order to allow the toolkit to be interoperable with other tools/applications. This allows for setting up cron-jobs to say backup a chat every X hours, setup hotkeys to do it on-command, or anything you can imagine in between.
+As can be seen above, the Urbit Content Archiver is quite straightforward to use. It uses a non-interactive interface in order to allow it to be interoperable with other tools/applications. This allows for setting up cron-jobs to say archive a chat every X hours, setup hotkeys to do it on-command, or anything you can imagine in between.
 
 ## Current Supported Commands & Flags
 
-### `chat export`
+### `chat`
 
-This command allows you to export the chat log from any chat which your ship has joined.
+This command allows you to export and archive any chat which your ship has joined.
 
 It can be used as such:
 
 ```sh
-./urbit-operator-toolkit chat export ~darrux-landes development
+./urbit-content-archiver chat ~darrux-landes development
 ```
 
 The chat graph will be requested from your ship (may take a number of seconds for your ship to process the request depending on chat size), and then once received, processed into a clean formatting style as seen below (do note all times are in UTC):
@@ -45,9 +45,9 @@ This flag allows you to specify which ship config yaml file to use via file path
 
 ### `--output=<folder_path>`
 
-This flag allows you to specify the output folder path where the output file will be saved.
+This flag allows you to specify the output folder path where the content output files will be saved.
 
-## Building The Toolkit
+## Building The Application
 
 Ensure that you have the [latest version of Rust installed](https://rustup.rs/) and the `libssl-dev` package on Ubuntu (aka `openssl-devel` on Fedora, and potentially slightly different on other distros).
 
@@ -59,12 +59,12 @@ Ensure that you have the [latest version of Rust installed](https://rustup.rs/) 
 sh setup.sh
 ```
 
-3. The Urbit Operator Toolkit application will be compiled, moved into the `deployed` folder, and a config file will be generated automatically for you.
+3. The Urbit Content Archiver application will be compiled, moved into the `deployed` folder, and a config file will be generated automatically for you.
 
 4. Edit `ship_config.yaml` with your Urbit ship's ip/port/`+code`.
 
-5. Use the toolkit:
+5. Use the archiver:
 
 ```sh
-./urbit-operator-toolkit
+./urbit-content-archiver
 ```
