@@ -21,7 +21,9 @@ As can be seen above, the Urbit Content Archiver is quite straightforward to use
 
 ### `chat`
 
-This command allows you to export and archive any chat which your ship has joined.
+![](images/chat-export.png)
+
+This command allows you to export and archive any chat which your ship has joined as a mardown file. Any media files that are linked to in the chat will be automatically downloaded locally and linked within the markdown as well.
 
 It can be used as such:
 
@@ -37,7 +39,7 @@ The chat graph will be requested from your ship (may take a number of seconds fo
 2020-04-29 01:23:10 - ~sarpen-laplux: the general pattern is that it's replacing a part in the subject, usually the state or something in the state, and then producing a set of effects to return. but it could be used for things other than state and effects, but it's very useful for that
 ```
 
-This is saved as a local text file as `<ship>-<name>.txt`.
+This is saved locally as `<ship>-<name>.md` and the downloaded media files are stored in the `archived-content` folder.
 
 ### `--config=<file_path>`
 
