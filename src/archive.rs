@@ -29,9 +29,10 @@ pub fn create_content_dir(args: &Args) {
 
 /// Acquires the current content directory based on the argument flags
 pub fn get_content_dir(args: &Args) -> String {
-    if args.flag_config.is_empty() {
-        return "archived-content".to_string();
-    } else {
-        return "/archived-content".to_string();
+    let mut path_string =
+        "archived-content".to_string() + "/" + &args.arg_ship + "-" + &args.arg_name;
+    if !args.flag_output.is_empty() {
+        path_string = args.flag_output.to_string() + "/" + &path_string;
     }
+    path_string
 }

@@ -37,7 +37,7 @@ The chat graph will be requested from your ship (may take a number of seconds fo
 2020-04-29 01:23:10 - ~sarpen-laplux: the general pattern is that it's replacing a part in the subject, usually the state or something in the state, and then producing a set of effects to return. but it could be used for things other than state and effects, but it's very useful for that
 ```
 
-This is saved as a local text file as `<chat_ship>-<chat_name>.txt`.
+This is saved as a local text file as `<ship>-<name>.txt`.
 
 ### `--config=<file_path>`
 
