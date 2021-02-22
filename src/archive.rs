@@ -21,9 +21,28 @@ pub fn download_file(args: &Args, url: &str) -> Option<String> {
     }
 }
 
+/// Given a `&str` website URL, checks if it is a media file which can be downloaded
+pub fn is_media_file_url(url: &str) -> bool {
+    let extensions = vec![
+        "png", "jpg", "jpeg", "gif", "svg", "mp4", "m4v", "webm", "mkv", "mov", "wmv", "wav",
+        "flv", "avi",
+    ];
+    let split_url: Vec<&str> = url.split(".").collect();
+
+    for ext in extensions {
+        if ext == split_url[split_url.len() - 1] {
+            return true;
+        }
+    }
+    false
+}
+
 /// Creates the archived content directory
 pub fn create_content_dir(args: &Args) {
     let content_dir = get_content_dir(args);
+    // Create base directory
+    let _res = fs::create_dir("archived-content");
+    // Create sub directory
     let _res = fs::create_dir(content_dir);
 }
 

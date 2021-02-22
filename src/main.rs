@@ -1,10 +1,14 @@
+mod archive;
+
+use archive::*;
 use docopt::Docopt;
+use json::object;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
 use urbit_http_api::{
-    create_new_ship_config_file, ship_interface_from_config, ship_interface_from_local_config,
-    Channel, ShipInterface,
+    chat::Message, create_new_ship_config_file, ship_interface_from_config,
+    ship_interface_from_local_config, Channel, ShipInterface,
 };
 
 const ASCII_TITLE: &'static str = r#"
@@ -18,7 +22,7 @@ const ASCII_TITLE: &'static str = r#"
 
 const USAGE: &'static str = r#"
 Usage:
-        urbit-content-archiver chat <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver chat <ship> <name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
       --output=<folder_path>  Specify a custom path where the output file will be saved.
@@ -26,10 +30,10 @@ Options:
 "#;
 
 #[derive(Debug, Deserialize)]
-struct Args {
+pub struct Args {
     cmd_chat: bool,
-    arg_chat_ship: String,
-    arg_chat_name: String,
+    arg_ship: String,
+    arg_name: String,
     flag_config: String,
     flag_output: String,
 }
@@ -54,7 +58,7 @@ fn main() {
 /// Exports the chat resource provided via arguments
 fn export_chat(args: Args, channel: &mut Channel) {
     // Set the path where the file will be saved
-    let file_name = format!("{}-{}.txt", &args.arg_chat_ship[1..], &args.arg_chat_name);
+    let file_name = format!("{}-{}.md", &args.arg_ship[1..], &args.arg_name);
     let file_path = match args.flag_output.is_empty() {
         true => file_name,
         false => format!("{}/{}", args.flag_output, file_name),
@@ -62,27 +66,54 @@ fn export_chat(args: Args, channel: &mut Channel) {
 
     println!(
         "Requesting {}/{} chat graph from your ship...",
-        &args.arg_chat_ship, &args.arg_chat_name
+        &args.arg_ship, &args.arg_name
     );
 
-    // Acquire the chat log from the ship
-    let chat_log_res = channel
+    // Acquire the authored messages from the ship
+    let authored_messages_res = channel
         .chat()
-        .export_chat_log(&args.arg_chat_ship, &args.arg_chat_name);
+        .export_authored_messages(&args.arg_ship, &args.arg_name);
 
-    // Save to file if acquiring and processing the chat log was successful
-    if let Ok(chat_log) = chat_log_res {
+    // Parse the authored message, save files, and save chat messages.
+    if let Ok(authored_messages) = authored_messages_res {
         println!("Chat graph received from ship.\nWriting chat to local file...");
+        let mut f = File::create(&file_path).expect("Failed to create chat export markdown file.");
 
-        let mut f = File::create(&file_path).expect("Failed to create chat export text file.");
         // Write messages to file
-        for message in chat_log {
-            writeln!(f, "{}", message).expect("Failed to write chat message to export text file.");
+        for authored_message in authored_messages {
+            let mut new_content_list = vec![];
+            for json in &authored_message.message.content_list {
+                // If the json content is a URL
+                if !json["url"].is_empty() {
+                    // If the URL is a media file
+                    let url = format!("{}", json["url"]);
+                    if is_media_file_url(&url) {
+                        // Download the media file locally and add location to text
+                        if let Some(file_path) = download_file(&args, &url) {
+                            let markdown_json = object! {
+                                "text": format!("![]({})", &file_path)
+                            };
+                            new_content_list.push(markdown_json);
+                        }
+                    }
+                } else {
+                    new_content_list.push(json.clone())
+                }
+            }
+            // The new `Message` that has had any media links downloaded & processed
+            let new_message = Message::from_json(new_content_list);
+            // Write the new message to the file
+            writeln!(f, "{}", new_message.to_formatted_string())
+                .expect("Failed to write chat message to export markdown file.");
         }
 
-        println!("Finished saving chat to: {}", file_path);
+        println!(
+            "Finished exporting chat to: {}\nFinished saving media files to: {}",
+            file_path,
+            get_content_dir(&args)
+        );
     } else {
-        println!("Failed to export chat. Please make sure that the `chat_ship` & `chat_name` are valid and are from a chat that your ship has joined.")
+        println!("Failed to export chat. Please make sure that the `ship` & `name` are valid and are from a chat that your ship has joined.")
     }
 }
 
@@ -92,6 +123,9 @@ fn basic_setup() -> (ShipInterface, Args) {
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
+
+    // Create the archived content directory
+    create_content_dir(&args);
 
     // If no custom config file provided
     if args.flag_config.is_empty() {
