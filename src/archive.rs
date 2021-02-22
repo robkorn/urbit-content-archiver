@@ -7,21 +7,21 @@ use urbit_http_api::chat::{AuthoredMessage, Message};
 /// Returns the path as a `String` on success.
 pub fn download_file(args: &Args, url: &str) -> Option<String> {
     let client = reqwest::blocking::Client::new();
-    let mut image_file = client.get(url).send().ok()?;
+    let mut media_file = client.get(url).send().ok()?;
 
     // Acquire file name and path
     let split_url: Vec<&str> = url.split("/").collect();
-    let image_name = split_url[split_url.len() - 1];
-    let path_string = get_content_dir(args) + "/" + image_name;
-    let path = Path::new(&path_string);
+    let media_name = split_url[split_url.len() - 1];
+    let download_path_string = get_content_dir(args) + "/" + media_name;
+    let path = Path::new(&download_path_string);
 
-    println!("Downloading {}", image_name);
+    println!("Downloading {}", media_name);
 
     // Create and save the file
     let mut file = File::create(&path).ok()?;
-    match std::io::copy(&mut image_file, &mut file) {
+    match std::io::copy(&mut media_file, &mut file) {
         Err(_) => panic!("couldn't write to {}", &path.to_string_lossy()),
-        Ok(_) => Some(path_string),
+        Ok(_) => Some(format!("archived-content/{}", media_name)),
     }
 }
 
