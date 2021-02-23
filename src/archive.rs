@@ -87,7 +87,7 @@ pub fn get_root_dir(args: &Args) -> String {
 /// with the media files
 pub fn to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> String {
     let mut new_content_list = vec![];
-    for json in &authored_message.message.content_list {
+    for json in &authored_message.contents.content_list {
         // If the json content is a URL
         if !json["url"].is_empty() {
             // Get the URL and the file name
