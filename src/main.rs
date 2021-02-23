@@ -2,7 +2,6 @@ mod archive;
 
 use archive::*;
 use docopt::Docopt;
-use json::object;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
@@ -25,7 +24,7 @@ Usage:
         urbit-content-archiver chat <ship> <name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
-      --output=<folder_path>  Specify a custom path where the output file will be saved.
+      --output=<folder_path>  Specify a custom path where the output files will be saved.
 
 "#;
 

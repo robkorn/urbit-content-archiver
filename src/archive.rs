@@ -7,33 +7,50 @@ use urbit_http_api::chat::{AuthoredMessage, Message};
 /// Returns the path as a `String` on success.
 pub fn download_file(args: &Args, url: &str) -> Option<String> {
     let client = reqwest::blocking::Client::new();
-    let mut media_file = client.get(url).send().ok()?;
 
     // Acquire file name and path
     let split_url: Vec<&str> = url.split("/").collect();
-    let media_name = split_url[split_url.len() - 1];
-    let download_path_string = get_content_dir(args) + "/" + media_name;
+    let file_name = split_url[split_url.len() - 1];
+    let download_path_string = get_content_dir(args) + "/" + file_name;
     let path = Path::new(&download_path_string);
 
     // If the file does not exist already, download it
     if !path.exists() {
-        println!("Downloading {}...", media_name);
+        println!("Downloading {}...", file_name);
+        let mut downloaded_file = client.get(url).send().ok()?;
         // Create and save the file
         let mut file = File::create(&path).ok()?;
-        let _res = std::io::copy(&mut media_file, &mut file).ok()?;
+        let _res = std::io::copy(&mut downloaded_file, &mut file).ok()?;
     } else {
-        println!("Already downloaded {}, skipping.", media_name);
+        println!("Already downloaded {}, skipping.", file_name);
     }
     // Return the inner path to the file in the `archived-content` folder
-    Some(format!("archived-content/{}", media_name))
+    Some(format!("archived-content/{}", file_name))
 }
 
 /// Given a `&str` website URL, checks if it is a media file which can be downloaded
 pub fn is_media_file_url(url: &str) -> bool {
     let extensions = vec![
-        "png", "jpg", "jpeg", "gif", "svg", "mp4", "m4v", "webm", "mkv", "mov", "wmv", "wav",
-        "flv", "avi",
+        "png", "jpg", "jpeg", "gif", "gifv", "mov", "qt", "svg", "mp4", "m4v", "mpv", "mpg",
+        "mpeg", "mp2", "3gp", "3gp2", "mpe", "webm", "mkv", "mov", "wmv", "wav", "flv", "avi",
+        "ogv", "flac", "ape", "mp3", "wav", "m4a", "opus", "aac", "m4b", "ogg", "oga", "raw",
     ];
+    matches_file_extensions(url, extensions)
+}
+
+/// Given a `&str` website URL, checks if it is a downloadable file
+pub fn is_downloadable_file_url(url: &str) -> bool {
+    let extensions = vec![
+        "pdf", "md", "txt", "epub", "mobi", "djvu", "doc", "docx", "fb2", "azw", "azw3", "kf8",
+        "kfx", "prc", "cbr", "torrent", "iso", "tar", "gz", "bz2", "lz", "lz4", "lzma", "lzo",
+        "bz", "bz2", "Z", "tbz2", "tlz", "rz", "xz", "zst", "txz", "zip", "7z", "ace", "apk",
+        "arc", "ark", "dmg", "jar", "rar",
+    ];
+    matches_file_extensions(url, extensions)
+}
+
+/// Checks if given url is a file which matches one from the list of extensions
+fn matches_file_extensions(url: &str, extensions: Vec<&str>) -> bool {
     let split_url: Vec<&str> = url.split(".").collect();
 
     for ext in extensions {
@@ -73,13 +90,26 @@ pub fn to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> St
     for json in &authored_message.message.content_list {
         // If the json content is a URL
         if !json["url"].is_empty() {
-            // If the URL is a media file
+            // Get the URL and the file name
             let url = format!("{}", json["url"]);
+            let split_url: Vec<&str> = url.split("/").collect();
+            let file_name = split_url[split_url.len() - 1];
+            // If the URL is a media file
             if is_media_file_url(&url) {
+                // Download the media file locally and add image markdown
+                if let Some(file_path) = download_file(&args, &url) {
+                    let markdown_json = object! {
+                        "text": format!("![{}]({})", file_name, &file_path)
+                    };
+                    new_content_list.push(markdown_json);
+                }
+            }
+            // Download file locally and add link markdown
+            else if is_downloadable_file_url(&url) {
                 // download the media file locally and add location to text
                 if let Some(file_path) = download_file(&args, &url) {
                     let markdown_json = object! {
-                        "text": format!("![]({})", &file_path)
+                        "text": format!("[{}]({})", file_name, &file_path)
                     };
                     new_content_list.push(markdown_json);
                 }
@@ -87,7 +117,7 @@ pub fn to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> St
             // If it's not a media file, it's just a normal url which needs to be linked
             else {
                 let markdown_json = object! {
-                    "text": format!("[{}]({})", url, url)
+                    "text": format!("[{}]({})", file_name, url)
                 };
                 new_content_list.push(markdown_json);
             }
