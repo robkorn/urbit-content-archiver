@@ -1,6 +1,6 @@
 ![](images/title.png)
 
-The Urbit Content Archiver is a small CLI application that exports channels from your Urbit ship and auto-downloads any linked media content locally in order to preserve and archive the content for the future.
+The Urbit Content Archiver is a small CLI application that exports channels from your Urbit ship and auto-downloads any directly linked content locally in order to preserve and archive the content for the future. The archiver supports media files (jpg, png, gif, mp3, flac, mkv, mp4, flc, etc.), archives (zip, 7z, tar, etc.), torrents, and text-based files (epub, pdf, doc, txt, etc.)
 
 This application uses the [Rust Urbit HTTP API Crate](https://crates.io/crates/urbit-http-api).
 
@@ -11,11 +11,11 @@ Usage:
         urbit-content-archiver chat <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
-      --output=<folder_path>  Specify a custom path where the output file will be saved.
+      --output=<folder_path>  Specify a custom path where the output files will be saved.
 
 ```
 
-As can be seen above, the Urbit Content Archiver is quite straightforward to use. It uses a non-interactive interface in order to allow it to be interoperable with other tools/applications. This allows for setting up cron-jobs to say archive a chat every X hours, setup hotkeys to do it on-command, or anything you can imagine in between.
+As can be seen above, the Urbit Content Archiver is quite straightforward to use. It uses a non-interactive interface in order to allow it to be interoperable with other tools/applications. This allows for setting up cron-jobs to say archive a chat every X hours, setup hotkeys to do it on-command, or anything you can imagine in between. Any previously archived content is skipped over (not downloaded again), thereby allowing you to keep running the archiver on the same channels and only downloading new content.
 
 ## Current Supported Commands & Flags
 
@@ -23,7 +23,7 @@ As can be seen above, the Urbit Content Archiver is quite straightforward to use
 
 ![](images/chat-export.png)
 
-This command allows you to export and archive any chat which your ship has joined as a mardown file. Any media files that are linked to in the chat will be automatically downloaded locally and linked within the markdown as well.
+This command allows you to export and archive any chat which your ship has joined as a markdown file. Any content files that are linked to in the chat will be automatically downloaded locally and linked within the markdown as well.
 
 It can be used as such:
 
@@ -33,7 +33,7 @@ It can be used as such:
 
 The chat graph will be requested from your ship (may take a number of seconds for your ship to process the request depending on chat size), and then once received, processed into a clean markdown formatting style as seen above (do note the above is a processed preview from the markdown).
 
-The markdown chat archive is saved locally as `<ship>-<name>.md` and the downloaded media files are stored in the `archived-content` folder.
+The markdown chat archive is saved locally as `<ship>-<name>.md` and the downloaded content is stored in the `archived-content` folder.
 
 ### `--config=<file_path>`
 
