@@ -15,14 +15,17 @@ pub fn download_file(args: &Args, url: &str) -> Option<String> {
     let download_path_string = get_content_dir(args) + "/" + media_name;
     let path = Path::new(&download_path_string);
 
-    println!("Downloading {}", media_name);
-
-    // Create and save the file
-    let mut file = File::create(&path).ok()?;
-    match std::io::copy(&mut media_file, &mut file) {
-        Err(_) => panic!("couldn't write to {}", &path.to_string_lossy()),
-        Ok(_) => Some(format!("archived-content/{}", media_name)),
+    // If the file does not exist already, download it
+    if !path.exists() {
+        println!("Downloading {}...", media_name);
+        // Create and save the file
+        let mut file = File::create(&path).ok()?;
+        let _res = std::io::copy(&mut media_file, &mut file).ok()?;
+    } else {
+        println!("Already downloaded {}, skipping.", media_name);
     }
+    // Return the inner path to the file in the `archived-content` folder
+    Some(format!("archived-content/{}", media_name))
 }
 
 /// Given a `&str` website URL, checks if it is a media file which can be downloaded
