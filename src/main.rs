@@ -85,7 +85,7 @@ fn export_chat(args: Args, channel: &mut Channel) {
             writeln!(
                 f,
                 "_{}_ - **{}**:{}  ",
-                authored_message.timestamp, authored_message.author, markdown_message
+                authored_message.time_sent, authored_message.author, markdown_message
             )
             .expect("Failed to write chat message to export markdown file.");
         }
