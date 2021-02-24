@@ -80,7 +80,7 @@ fn export_chat(args: Args, channel: &mut Channel) {
 
         // Write messages to file
         for authored_message in authored_messages {
-            let markdown_message = to_markdown_string(&args, &authored_message);
+            let markdown_message = message_to_markdown_string(&args, &authored_message);
             // Write the new message to the file
             writeln!(
                 f,
