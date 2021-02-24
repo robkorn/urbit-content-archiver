@@ -51,25 +51,6 @@ pub fn get_root_dir(args: &Args) -> String {
     path_string
 }
 
-/// Convert an `AuthoredMessage` into a single markdown `String`
-/// with the media files
-pub fn message_to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> String {
-    let mut new_content_list = vec![];
-    for json in &authored_message.contents.content_list {
-        // If the json content is a URL
-        if !json["url"].is_empty() {
-            // Get the URL and convert it into a markdown string
-            let url = format!("{}", json["url"]);
-            new_content_list.push(download_and_convert_to_markdown(&args, &url));
-        } else {
-            new_content_list.push(json.clone())
-        }
-    }
-    // The new `Message` that has had any media links downloaded & processed
-    let new_message = Message::from_json(new_content_list);
-    new_message.to_formatted_string()
-}
-
 /// Downloads directly linked content at the provided URL and converts local link to markdown
 /// and embeds it within a `NodeContent` schemed `JsonValue`
 pub fn download_and_convert_to_markdown(args: &Args, url: &str) -> JsonValue {
@@ -88,7 +69,7 @@ pub fn download_and_convert_to_markdown(args: &Args, url: &str) -> JsonValue {
     }
     // Download file locally and add link markdown
     else if is_downloadable_file_url(&url) {
-        // download the media file locally and add location to text
+        // download the file locally and add location to text
         if let Some(file_path) = download_file(&args, &url) {
             return object! {
                 "text": format!("[{}]({})", file_name, &file_path)
@@ -96,7 +77,7 @@ pub fn download_and_convert_to_markdown(args: &Args, url: &str) -> JsonValue {
         }
         return object! {};
     }
-    // If it's not a media file, it's just a normal url which needs to be linked
+    // If it's not a content file, it's just a normal url which needs to be linked
     else {
         return object! {
             "text": format!("[{}]({})", file_name, url)
