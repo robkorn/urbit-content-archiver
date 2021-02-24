@@ -84,3 +84,22 @@ pub fn download_and_convert_to_markdown(args: &Args, url: &str) -> JsonValue {
         };
     }
 }
+
+/// Convert an `AuthoredMessage` (or `Comment` which is just an alias)
+/// into a single markdown `String` with the content files downloaded
+pub fn message_to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> String {
+    let mut new_content_list = vec![];
+    for json in &authored_message.contents.content_list {
+        // If the json content is a URL
+        if !json["url"].is_empty() {
+            // Get the URL and convert it into a markdown string
+            let url = format!("{}", json["url"]);
+            new_content_list.push(download_and_convert_to_markdown(&args, &url));
+        } else {
+            new_content_list.push(json.clone())
+        }
+    }
+    // The new `Message` that has had any media links downloaded & processed
+    let new_message = Message::from_json(new_content_list);
+    new_message.to_formatted_string()
+}

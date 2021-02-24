@@ -2,7 +2,7 @@ use crate::archive::*;
 use crate::Args;
 use std::fs::File;
 use std::io::Write;
-use urbit_http_api::{chat::Message, notebook::Note, Channel};
+use urbit_http_api::{comment::Comment, notebook::Note, Channel};
 
 /// Exports the notebook resource provided via arguments
 pub fn export_notebook(args: Args, channel: &mut Channel) {
@@ -50,7 +50,7 @@ pub fn export_notebook(args: Args, channel: &mut Channel) {
 /// with the content files downloaded
 pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
     let mut markdown_strings = vec![];
-    markdown_strings.push(format!("## {}", note.title));
+    markdown_strings.push(format!("# {}", note.title));
     markdown_strings.push(format!("##### {} - {}", note.time_sent, note.author));
 
     for content_lines in note.content_as_markdown() {
@@ -71,12 +71,34 @@ pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
     // }
     // Use the `Message` .to_formatted_string() method to process the note
 
+    // Add comments title if comments exist
+    if note.comments.len() > 0 {
+        markdown_strings.push(format!("## Comments"));
+    }
     // Process the comments of the `Note`
-    // let mut new_content_list = vec![];
-    for json in &note.comments {}
+    for comment_string in comments_to_markdown_strings(args, &note.comments) {
+        markdown_strings.push(comment_string)
+    }
 
     // Add a dividing line at the end of the note markdown
+    markdown_strings.push("  ".to_string());
     markdown_strings.push("-----".to_string());
 
+    markdown_strings
+}
+
+pub fn comments_to_markdown_strings(args: &Args, comments: &Vec<Comment>) -> Vec<String> {
+    let mut markdown_strings = vec![];
+    // Process the comments of the `Note`
+    for comment in comments {
+        println!("Comment: {:?}", comment);
+        let comment_string = format!(
+            "_{}_ - **{}**:{}  ",
+            comment.time_sent,
+            comment.author,
+            message_to_markdown_string(&args, comment)
+        );
+        markdown_strings.push(comment_string)
+    }
     markdown_strings
 }

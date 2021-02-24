@@ -1450,7 +1450,7 @@ dependencies = [
 [[package]]
 name = "urbit-http-api"
 version = "0.4.0"
-source = "git+https://github.com/robkorn/rust-urbit-http-api/?branch=main#95dee3398009adc90431dcb129cb15cd3c95c8f8"
+source = "git+https://github.com/robkorn/rust-urbit-http-api/?branch=main#78a55bc2d473da28fafdb859543dfcaa1e2d8fc2"
 dependencies = [
  "chrono",
  "crossbeam",
