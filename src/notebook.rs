@@ -49,6 +49,7 @@ pub fn export_notebook(args: Args, channel: &mut Channel) {
 /// with the content files downloaded
 pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
     let mut markdown_strings = vec![];
+    markdown_strings.push(format!("## {}", note.title));
     markdown_strings.push(format!("##### {} - {}", note.time_sent, note.author));
 
     // Process the content of the `Note`

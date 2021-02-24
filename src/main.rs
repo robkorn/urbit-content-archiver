@@ -25,15 +25,17 @@ const ASCII_TITLE: &'static str = r#"
 const USAGE: &'static str = r#"
 Usage:
         urbit-content-archiver chat <ship> <name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver notebook <ship> <name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
       --output=<folder_path>  Specify a custom path where the output files will be saved.
 
 "#;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Args {
     cmd_chat: bool,
+    cmd_notebook: bool,
     arg_ship: String,
     arg_name: String,
     flag_config: String,
@@ -50,7 +52,11 @@ fn main() {
 
     // Chat export
     if args.cmd_chat {
-        export_chat(args, &mut channel);
+        export_chat(args.clone(), &mut channel);
+    }
+    // Notebook export
+    if args.cmd_notebook {
+        export_notebook(args, &mut channel);
     }
 
     // Delete the channel
