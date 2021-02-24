@@ -2,7 +2,7 @@ use crate::archive::*;
 use crate::Args;
 use std::fs::File;
 use std::io::Write;
-use urbit_http_api::{notebook::Note, Channel};
+use urbit_http_api::{chat::Message, notebook::Note, Channel};
 
 /// Exports the notebook resource provided via arguments
 pub fn export_notebook(args: Args, channel: &mut Channel) {
@@ -45,22 +45,31 @@ pub fn export_notebook(args: Args, channel: &mut Channel) {
     }
 }
 
-/// Convert an `Note` into a set of prepared markdown `String`s
+/// Convert a `Note` into a set of prepared markdown `String`s
 /// with the content files downloaded
-pub fn note_to_markdown_strings(args: &Args, authored_message: &Note) -> Vec<String> {
-    todo!();
+pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
+    let mut markdown_strings = vec![];
+    markdown_strings.push(format!("##### {} - {}", note.time_sent, note.author));
+
+    // Process the content of the `Note`
+    let mut new_content_list = vec![];
+    for json in &note.content.content_list {
+        // If the json content is a URL
+        if !json["url"].is_empty() {
+            // Get the URL and convert it into a markdown string
+            let url = format!("{}", json["url"]);
+            new_content_list.push(download_and_convert_to_markdown(&args, &url));
+        } else {
+            new_content_list.push(json.clone())
+        }
+    }
+    // Use the `Message` .to_formatted_string() method to process the note
+    let processed_content_string = Message::from_json(new_content_list).to_formatted_string();
+    markdown_strings.push(processed_content_string);
+
+    // Process the comments of the `Note`
     // let mut new_content_list = vec![];
-    // for json in &authored_message.contents.content_list {
-    //     // If the json content is a URL
-    //     if !json["url"].is_empty() {
-    //         // Get the URL and convert it into a markdown string
-    //         let url = format!("{}", json["url"]);
-    //         new_content_list.push(download_and_convert_to_markdown(&args, &url));
-    //     } else {
-    //         new_content_list.push(json.clone())
-    //     }
-    // }
-    // // The new `Message` that has had any media links downloaded & processed
-    // let new_message = Message::from_json(new_content_list);
-    // new_message.to_formatted_string()
+    for json in &note.comments {}
+
+    markdown_strings
 }
