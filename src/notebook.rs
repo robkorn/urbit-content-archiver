@@ -30,6 +30,7 @@ pub fn export_notebook(args: Args, channel: &mut Channel) {
 
         // Write notes to file
         for note in notes {
+            println!("{:?}", note);
             for markdown_line in note_to_markdown_strings(&args, &note) {
                 writeln!(f, "{}", markdown_line).expect("Failed to write to export markdown file.");
             }
@@ -52,25 +53,30 @@ pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
     markdown_strings.push(format!("## {}", note.title));
     markdown_strings.push(format!("##### {} - {}", note.time_sent, note.author));
 
-    // Process the content of the `Note`
-    let mut new_content_list = vec![];
-    for json in &note.content.content_list {
-        // If the json content is a URL
-        if !json["url"].is_empty() {
-            // Get the URL and convert it into a markdown string
-            let url = format!("{}", json["url"]);
-            new_content_list.push(download_and_convert_to_markdown(&args, &url));
-        } else {
-            new_content_list.push(json.clone())
-        }
+    for content_lines in note.content_as_markdown() {
+        markdown_strings.push(content_lines);
     }
+
+    // Process the content of the `Note`
+    // let mut new_content_list = vec![];
+    // for json in &note.content.content_list {
+    //     // If the json content is a URL
+    //     if !json["url"].is_empty() {
+    //         // Get the URL and convert it into a markdown string
+    //         let url = format!("{}", json["url"]);
+    //         new_content_list.push(download_and_convert_to_markdown(&args, &url));
+    //     } else {
+    //         new_content_list.push(json.clone())
+    //     }
+    // }
     // Use the `Message` .to_formatted_string() method to process the note
-    let processed_content_string = Message::from_json(new_content_list).to_formatted_string();
-    markdown_strings.push(processed_content_string);
 
     // Process the comments of the `Note`
     // let mut new_content_list = vec![];
     for json in &note.comments {}
+
+    // Add a dividing line at the end of the note markdown
+    markdown_strings.push("-----".to_string());
 
     markdown_strings
 }
