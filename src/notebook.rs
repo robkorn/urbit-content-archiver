@@ -30,7 +30,6 @@ pub fn export_notebook(args: Args, channel: &mut Channel) {
 
         // Write notes to file
         for note in notes {
-            println!("{:?}", note);
             for markdown_line in note_to_markdown_strings(&args, &note) {
                 writeln!(f, "{}", markdown_line).expect("Failed to write to export markdown file.");
             }
@@ -54,22 +53,9 @@ pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
     markdown_strings.push(format!("##### {} - {}", note.time_sent, note.author));
 
     for content_lines in note.content_as_markdown() {
-        markdown_strings.push(content_lines);
+        let parsed_markdown = parse_link_in_markdown_string(args, &content_lines);
+        markdown_strings.push(parsed_markdown);
     }
-
-    // Process the content of the `Note`
-    // let mut new_content_list = vec![];
-    // for json in &note.content.content_list {
-    //     // If the json content is a URL
-    //     if !json["url"].is_empty() {
-    //         // Get the URL and convert it into a markdown string
-    //         let url = format!("{}", json["url"]);
-    //         new_content_list.push(download_and_convert_to_markdown(&args, &url));
-    //     } else {
-    //         new_content_list.push(json.clone())
-    //     }
-    // }
-    // Use the `Message` .to_formatted_string() method to process the note
 
     // Add comments title if comments exist
     if note.comments.len() > 0 {
@@ -87,11 +73,32 @@ pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
     markdown_strings
 }
 
+/// Parse markdown string for a link. If one is found, attempt to download
+/// it if it is a direct file link, and update the markdown string with the new local
+/// link.
+pub fn parse_link_in_markdown_string(args: &Args, markdown: &str) -> String {
+    if let Some(bracket_start) = markdown.find("](") {
+        if let Some(bracket_end) = markdown[bracket_start..].find(")") {
+            // Define the parts of the string
+            let pre = markdown[..bracket_start].to_string();
+            let url = markdown[bracket_start + 2..bracket_end + 2].to_string();
+            let post = markdown[bracket_end + 2..].to_string();
+
+            // If url is a direct link and downloaded the file successfully
+            if let Some(local_file_path) = download_file(args, &url) {
+                // Return markdown with local link
+                return pre.to_string() + "](" + &local_file_path + &post;
+            }
+        }
+    }
+    markdown.to_string()
+}
+
+/// Convert `Comment`s to markdown strings
 pub fn comments_to_markdown_strings(args: &Args, comments: &Vec<Comment>) -> Vec<String> {
     let mut markdown_strings = vec![];
     // Process the comments of the `Note`
     for comment in comments {
-        println!("Comment: {:?}", comment);
         let comment_string = format!(
             "_{}_ - **{}**:{}  ",
             comment.time_sent,
