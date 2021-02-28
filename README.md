@@ -8,7 +8,8 @@ This application uses the [Rust Urbit HTTP API Crate](https://crates.io/crates/u
 
 ```
 Usage:
-        urbit-content-archiver chat <chat-ship> <chat-name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver chat <ship> <name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver notebook <ship> <name> [--config=<file_path> --output=<folder_path>]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
       --output=<folder_path>  Specify a custom path where the output files will be saved.
@@ -29,6 +30,20 @@ It can be used as such:
 
 ```sh
 ./urbit-content-archiver chat ~darrux-landes development
+```
+
+The chat graph will be requested from your ship (may take a number of seconds for your ship to process the request depending on chat size), and then once received, processed into a clean markdown formatting style as seen above (do note the above is a processed preview from the markdown).
+
+The markdown chat archive is saved locally as `<ship>-<name>.md` and the downloaded content is stored in the `archived-content` folder.
+
+### `notebook`
+
+This command allows you to export and archive any notebook which your ship has joined as a markdown file. Any media or content files that are linked in the notebook (via the `[]()` markdown linking format) will be automatically downloaded locally and linked within the markdown as well.
+
+It can be used as such:
+
+```sh
+./urbit-content-archiver notebook ~bollug-worlus index-weekly
 ```
 
 The chat graph will be requested from your ship (may take a number of seconds for your ship to process the request depending on chat size), and then once received, processed into a clean markdown formatting style as seen above (do note the above is a processed preview from the markdown).

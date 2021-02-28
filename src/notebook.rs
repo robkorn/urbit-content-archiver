@@ -77,17 +77,27 @@ pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
 /// it if it is a direct file link, and update the markdown string with the new local
 /// link.
 pub fn parse_link_in_markdown_string(args: &Args, markdown: &str) -> String {
-    if let Some(bracket_start) = markdown.find("](") {
-        if let Some(bracket_end) = markdown[bracket_start..].find(")") {
+    let markdown = markdown.to_string();
+    if let Some(bracket_start) = markdown.find("]") {
+        // If no full link on a single line, then skip
+        if bracket_start + 2 > markdown.len() {
+            return markdown.to_string();
+        }
+        if let Some(bracket_end) = markdown.find(")") {
+            // If no full link on a single line, then skip
+            if bracket_end + 2 > markdown.len() {
+                return markdown.to_string();
+            }
             // Define the parts of the string
             let pre = markdown[..bracket_start].to_string();
-            let url = markdown[bracket_start + 2..bracket_end + 2].to_string();
+            let url = markdown[bracket_start + 2..bracket_end].to_string();
+            println!("url: {}", url);
             let post = markdown[bracket_end + 2..].to_string();
 
             // If url is a direct link and downloaded the file successfully
             if let Some(local_file_path) = download_file(args, &url) {
                 // Return markdown with local link
-                return pre.to_string() + "](" + &local_file_path + &post;
+                return pre.to_string() + "](" + &local_file_path + ")" + &post;
             }
         }
     }
