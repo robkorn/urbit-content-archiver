@@ -91,7 +91,6 @@ pub fn parse_link_in_markdown_string(args: &Args, markdown: &str) -> String {
             // Define the parts of the string
             let pre = markdown[..bracket_start].to_string();
             let url = markdown[bracket_start + 2..bracket_end].to_string();
-            println!("url: {}", url);
             let post = markdown[bracket_end + 2..].to_string();
 
             // If url is a direct link and downloaded the file successfully
