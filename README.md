@@ -4,6 +4,8 @@ The Urbit Content Archiver is a small CLI application that exports channels from
 
 This application uses the [Rust Urbit HTTP API Crate](https://crates.io/crates/urbit-http-api).
 
+[![awesome urbit badge](https://img.shields.io/badge/~-awesome%20urbit-lightgrey)](https://github.com/urbit/awesome-urbit)
+
 ## Using The Urbit Content Archiver
 
 ```
