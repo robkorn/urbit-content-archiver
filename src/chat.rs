@@ -18,7 +18,7 @@ pub fn export_chat(args: Args, channel: &mut Channel) {
     // Acquire the authored messages from the ship
     let authored_messages_res = channel
         .chat()
-        .export_authored_messages(&args.arg_ship, &args.arg_name);
+        .export_chat_authored_messages(&args.arg_ship, &args.arg_name);
 
     // Parse the authored message, save files, and save chat messages.
     if let Ok(authored_messages) = authored_messages_res {

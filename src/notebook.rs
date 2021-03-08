@@ -2,7 +2,10 @@ use crate::archive::*;
 use crate::Args;
 use std::fs::File;
 use std::io::Write;
-use urbit_http_api::{comment::Comment, notebook::Note, Channel};
+use urbit_http_api::{
+    notebook::{Comment, Note},
+    Channel,
+};
 
 /// Exports the notebook resource provided via arguments
 pub fn export_notebook(args: Args, channel: &mut Channel) {

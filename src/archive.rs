@@ -2,7 +2,7 @@ use crate::extensions::*;
 use crate::Args;
 use json::{object, JsonValue};
 use std::{fs, fs::File, path::Path};
-use urbit_http_api::chat::{AuthoredMessage, Message};
+use urbit_http_api::{AuthoredMessage, Message};
 
 /// Downloads a file to the archived content directory.
 /// Returns the path as a `String` on success.
