@@ -90,8 +90,12 @@ pub fn download_and_convert_to_markdown(args: &Args, url: &str) -> JsonValue {
 pub fn message_to_markdown_string(args: &Args, authored_message: &AuthoredMessage) -> String {
     let mut new_content_list = vec![];
     for json in &authored_message.contents.content_list {
+        // If flag to skip downloading is true
+        if args.flag_skip_downloading {
+            new_content_list.push(json.clone())
+        }
         // If the json content is a URL
-        if !json["url"].is_empty() {
+        else if !json["url"].is_empty() {
             // Get the URL and convert it into a markdown string
             let url = format!("{}", json["url"]);
             new_content_list.push(download_and_convert_to_markdown(&args, &url));

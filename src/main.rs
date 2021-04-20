@@ -24,11 +24,12 @@ const ASCII_TITLE: &'static str = r#"
 
 const USAGE: &'static str = r#"
 Usage:
-        urbit-content-archiver chat <ship> <name> [--config=<file_path> --output=<folder_path>]
-        urbit-content-archiver notebook <ship> <name> [--config=<file_path> --output=<folder_path>]
+        urbit-content-archiver chat <ship> <name> [--config=<file_path> --output=<folder_path> --skip-downloading]
+        urbit-content-archiver notebook <ship> <name> [--config=<file_path> --output=<folder_path> --skip-downloading]
 Options:
       --config=<file_path>  Specify a custom path to a YAML ship config file.
       --output=<folder_path>  Specify a custom path where the output files will be saved.
+      --skip-downloading  Skips downloading content locally.
 
 "#;
 
@@ -40,6 +41,7 @@ pub struct Args {
     arg_name: String,
     flag_config: String,
     flag_output: String,
+    flag_skip_downloading: bool,
 }
 
 fn main() {
