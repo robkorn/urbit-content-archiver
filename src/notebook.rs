@@ -3,7 +3,7 @@ use crate::Args;
 use std::fs::File;
 use std::io::Write;
 use urbit_http_api::{
-    notebook::{Comment, Note},
+    apps::notebook::{Comment, Note},
     Channel,
 };
 
@@ -25,7 +25,6 @@ pub fn export_notebook(args: Args, channel: &mut Channel) {
 
     // Parse the authored message, save files, and save chat messages.
     if let Ok(notes) = notes_res {
-        println!("Chat graph received from ship.\nWriting chat to local file...");
         let mut f = File::create(&file_path).expect("Failed to create chat export markdown file.");
         // Write markdown header into file
         writeln!(f, "# {}/{} Archive ", &args.arg_ship, &args.arg_name)
