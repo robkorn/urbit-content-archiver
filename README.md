@@ -60,6 +60,10 @@ This flag allows you to specify which ship config yaml file to use via file path
 
 This flag allows you to specify the output folder path where the archived data will be saved.
 
+### `--skip-downloading`
+
+This flag allows you to skip downloading content files locally.
+
 ## Building The Application
 
 Ensure that you have the [latest version of Rust installed](https://rustup.rs/) and the `libssl-dev` package on Ubuntu (aka `openssl-devel` on Fedora, and potentially slightly different on other distros).

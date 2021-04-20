@@ -79,6 +79,11 @@ pub fn note_to_markdown_strings(args: &Args, note: &Note) -> Vec<String> {
 /// it if it is a direct file link, and update the markdown string with the new local
 /// link.
 pub fn parse_link_in_markdown_string(args: &Args, markdown: &str) -> String {
+    // If flag to skip downloading is true
+    if args.flag_skip_downloading {
+        return markdown.to_string();
+    }
+
     let markdown = markdown.to_string();
     if let Some(bracket_start) = markdown.find("]") {
         // If no full link on a single line, then skip
