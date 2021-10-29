@@ -9,7 +9,7 @@ edition = "2018"
 
 [dependencies]
 # urbit-http-api          = { git = "https://github.com/robkorn/rust-urbit-http-api/", branch = "main"}
-urbit-http-api          = "0.7.2"
+urbit-http-api          = "0.7.3"
 json                    = "0.12.4"
 serde                   = "1.0.123"
 docopt                  = "1.1.0"
