@@ -86,24 +86,26 @@ pub fn parse_link_in_markdown_string(args: &Args, markdown: &str) -> String {
 
     let markdown = markdown.to_string();
     if let Some(bracket_start) = markdown.find("]") {
-        // If no full link on a single line, then skip
-        if bracket_start + 2 > markdown.len() {
-            return markdown.to_string();
-        }
-        if let Some(bracket_end) = markdown.find(")") {
+        if markdown.chars().nth(bracket_start + 1) == Some('(') {
             // If no full link on a single line, then skip
-            if bracket_end + 2 > markdown.len() {
+            if bracket_start + 2 > markdown.len() {
                 return markdown.to_string();
             }
-            // Define the parts of the string
-            let pre = markdown[..bracket_start].to_string();
-            let url = markdown[bracket_start + 2..bracket_end].to_string();
-            let post = markdown[bracket_end + 2..].to_string();
+            if let Some(bracket_end) = markdown.find(")") {
+                // If no full link on a single line, then skip
+                if bracket_end + 2 > markdown.len() {
+                    return markdown.to_string();
+                }
+                // Define the parts of the string
+                let pre = markdown[..bracket_start].to_string();
+                let url = markdown[bracket_start + 2..bracket_end].to_string();
+                let post = markdown[bracket_end + 2..].to_string();
 
-            // If url is a direct link and downloaded the file successfully
-            if let Some(local_file_path) = download_file(args, &url) {
-                // Return markdown with local link
-                return pre.to_string() + "](" + &local_file_path + ")" + &post;
+                // If url is a direct link and downloaded the file successfully
+                if let Some(local_file_path) = download_file(args, &url) {
+                    // Return markdown with local link
+                    return pre.to_string() + "](" + &local_file_path + ")" + &post;
+                }
             }
         }
     }
